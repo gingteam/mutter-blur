@@ -1,0 +1,28 @@
+name: mutter-blur
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout mutter-rounded repo
+        uses: actions/checkout@v3
+        with:
+          repository: yilozt/mutter-rounded
+      - name: Update dependencies
+        run: |
+          sudo sed -i '/deb-src/s/^# //' /etc/apt/sources.list && sudo apt update
+      - name: Mutter build
+        run: |
+          cd ubuntu
+          ./package.sh
+      - uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: latest
+          prerelease: true
+          title: Development Build
+          files: |
+            ubuntu/*.deb
